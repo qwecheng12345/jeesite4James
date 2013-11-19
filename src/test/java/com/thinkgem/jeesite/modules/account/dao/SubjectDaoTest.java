@@ -2,12 +2,15 @@ package com.thinkgem.jeesite.modules.account.dao;
 
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.thinkgem.jeesite.common.test.SpringTransactionalContextTests;
 import com.thinkgem.jeesite.modules.account.entity.Subject;
+import com.thinkgem.jeesite.modules.sys.utils.AccountUtils;
 
 /**
  * SubjectDaoTest
@@ -45,7 +48,8 @@ public class SubjectDaoTest extends SpringTransactionalContextTests {
 
 	@Test
 	public void testFindAll() {
-		fail("Not yet implemented");
+		List<Subject> subjects = AccountUtils.getSubjectList();
+		System.out.println(subjects.size());
 	}
 
 	@Test

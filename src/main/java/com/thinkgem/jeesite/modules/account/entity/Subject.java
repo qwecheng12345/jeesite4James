@@ -17,7 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -50,6 +50,12 @@ public class Subject extends DataEntity {
 	private Subject parent;
 	private String name;
 	private String type;
+	private String parentIds;
+	private String level;
+	
+	public static final String LEVEL0 = "0";
+	public static final String LEVEL1 = "1";
+	public static final String LEVEL2 = "2";
 
 	private List<Subject> subjectList = Lists.newArrayList();
 	
@@ -109,5 +115,52 @@ public class Subject extends DataEntity {
 	public void setSubjectList(List<Subject> subjectList) {
 		this.subjectList = subjectList;
 	}
+
+	@Length(min=1, max=255)
+	public String getParentIds() {
+		return parentIds;
+	}
 	
+	public void setParentIds(String parentIds) {
+		this.parentIds = parentIds;
+	}
+	
+	@Length(min=1, max=255)
+	public String getLevel() {
+		return level;
+	}
+
+	public void setLevel(String level) {
+		this.level = level;
+	}
+
+	@Transient
+	public static void sortList(List<Subject> list, List<Subject> sourcelist, Long parentId){
+		for (int i=0; i<sourcelist.size(); i++){
+			Subject e = sourcelist.get(i);
+			if (e.getParent()!=null && e.getParent().getId()!=null
+					&& e.getParent().getId().equals(parentId)){
+				list.add(e);
+				// 判断是否还有子节点, 有则继续获取子节点
+				for (int j=0; j<sourcelist.size(); j++){
+					Subject child = sourcelist.get(j);
+					if (child.getParent()!=null && child.getParent().getId()!=null
+							&& child.getParent().getId().equals(e.getId())){
+						sortList(list, sourcelist, e.getId());
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	@Transient
+	public boolean isRoot(){
+		return isRoot(this.id);
+	}
+	
+	@Transient
+	public static boolean isRoot(Long id){
+		return id != null && id.equals(1L);
+	}
 }
